@@ -1,6 +1,14 @@
 #################################### LOAD REQUIRED PACKAGES ####################
 library(tidyverse)
 library(ggpubr)
+library(SingleCellExperiment)
+library(dplyr)
+library(ggplot2)
+library(multinichenetr)
+library(nichenetr)
+library(Seurat)
+library(gridGraphics)
+library(patchwork)
 #################################### FIGURE 1 ##################################
 ###################################################################### Figure 1a
 Fig1a <- magick::image_read("HIV-PAPER/Figures/Figure 1/Fig1a.png")
@@ -997,8 +1005,9 @@ Supplementary_Fig2k <- Supp_Figure_2_data %>%
 Supplementary_Fig2k
 
 #################################### FIGURE 3 ##################################
-Figure_3_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3def_5abcd_data.rds")
+Figure_3_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3abc_4a_5d-5f_6d-6f_supp_fig3_data.rds")
 all_merged_subset_labelled_new <- Figure_3_data
+DimPlot(all_merged_subset_labelled_new)
 # Define a consistent color palette for 17 clusters
 all_merged_subset_labelled_new$Clusters <- paste0(all_merged_subset_labelled_new@active.ident)
 all_merged_subset_labelled_new <- RenameIdents(all_merged_subset_labelled_new,
@@ -1040,11 +1049,6 @@ Fig3a <- DimPlot(
         legend.key.width = unit(1, "cm"))  # Width of legend keys
 Fig3a <- as.ggplot(Fig3a)
 Fig3a
-# Save Figure 3a
-ggsave(Fig3a,filename="HIV-PAPER/Figures/Figure 3/Fig3a.png",
-       width = 12,height = 9,dpi = 300)
-ggsave(Fig3a,filename="HIV-PAPER/Figures/Figure 3/Fig3a.pdf",
-       width = 12,height = 9,dpi = 300)
 
 # Figure 3b (Main Bargraph)
 # Calculate cluster proportion 
@@ -1084,11 +1088,6 @@ Fig3b <- cluster_df %>%
       keyheight = unit(1, "cm")))
 Fig3b
 
-# Save Figure 4b
-ggsave(Fig3b,filename="HIV-PAPER/Figures/Figure 3/Fig3b.png",
-       width = 10,height = 12,dpi = 300)
-ggsave(Fig3b,filename="HIV-PAPER/Figures/Figure 3/Fig3b.pdf",
-       width = 10,height = 12,dpi = 300)
 
 # Figure 3c (vlnPlot of celltype markers)
 celltype_markers <- c(
@@ -1129,14 +1128,9 @@ Fig3c <- Seurat::VlnPlot(all_merged_subset_labelled_new,
         strip.text.x = element_text(angle = 80, vjust = 0.5,size = 14))
 Fig3c
 
-# Save Figure 3c
-ggsave(Fig3c,filename="HIV-PAPER/Figures/Figure 3/Fig3c.png",
-       width = 20,height = 6,dpi = 300)
-ggsave(Fig3c,filename="HIV-PAPER/Figures/Figure 3/Fig3c.pdf",
-       width = 20,height = 6,dpi = 300)
 
 # Figure 3d (Immune cells UMAP)
-Figure_3d_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_5abcd_data.rds")
+Figure_3d_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3def_5abcdgj_data.rds")
 DimPlot(Figure_3d_data)
 Immune_cells <- Figure_3d_data
 Immune_cells <- RenameIdents(Immune_cells,
@@ -1177,11 +1171,6 @@ Fig3d <- Seurat::DimPlot(
         legend.key.width = unit(1, "cm"))  # Width of legend keys)
 Fig3d <- as.ggplot(Fig3d)
 Fig3d
-# Save Figure 3d
-ggsave(Fig3d,filename="HIV-PAPER/Figures/Figure 3/Fig3d.png",
-       width = 8,height = 8,dpi = 300)
-ggsave(Fig3d,filename="HIV-PAPER/Figures/Figure 3/Fig3d.pdf",
-       width = 8,height = 8,dpi = 300)
 
 # Figure 3e (Immune cell proportion bargraph)
 # Calculate cluster proportion 
@@ -1220,13 +1209,7 @@ Fig3e <- Immune_cluster_df %>%
       keyheight = unit(1, "cm")))
 Fig3e
 
-# Save Figure 3e
-ggsave(Fig3e,filename="HIV-PAPER/Figures/Figure 3/Fig3e.png",
-       width = 10,height = 12,dpi = 300)
-ggsave(Fig3e,filename="HIV-PAPER/Figures/Figure 3/Fig3e.pdf",
-       width = 10,height = 12,dpi = 300)
-
-# Figure 3g (Neutrophil epithelial ratio from scRNA sequencing data)
+# Figure 3f (Neutrophil epithelial ratio from scRNA sequencing data)
 cluster_df <- as.data.frame(table(all_merged_subset_labelled_new$Clusters,
                                   all_merged_subset_labelled_new$sample))
 
@@ -1291,10 +1274,7 @@ Fig3f <- cluster_df %>%
         axis.text.y = element_text(size = 30),
         axis.title = element_text(size = 30))
 Fig3f
-ggsave(Fig3f,filename="HIV-PAPER/Figures/Figure 3/Fig3f.png",
-       width = 14,height = 18,dpi = 300)
-ggsave(Fig3f,filename="HIV-PAPER/Figures/Figure 3/Fig3f.pdf",
-       width = 14,height = 18,dpi = 300)
+
 #################################### SUPPLEMENTARY FIGURE 3 ####################
 Supp_Figure_3_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3abc_4_supp_fig3_data.rds")
 Supp_Figure_3_data <- FindVariableFeatures(Supp_Figure_3_data,
@@ -1330,17 +1310,10 @@ Supplementary_Figure_3a <- Seurat::VlnPlot(Supp_Figure_3_data,
 Supplementary_Figure_3a
 #################################### FIGURE 4a #################################
 ####### Cell to cell communication between  epithelial cells and to nasal neutrophils
-library(SingleCellExperiment)
-library(dplyr)
-library(ggplot2)
-library(multinichenetr)
-library(nichenetr)
-library(Seurat)
-library(gridGraphics)
-library(patchwork)
 # Load the data
-Figure_4_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3_data.rds")
+Figure_4_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3abc_4a_5d-5f_6d-6f_supp_fig3_data.rds")
 all_merged_subset_labelled_new <- Figure_4_data
+DimPlot(all_merged_subset_labelled_new)
 # Load the organism
 organism = "human"
 if(organism == "human"){
@@ -1723,15 +1696,6 @@ print(Fig4a)
 
 #################################### SUPPLEMENTARY FIGURE 4a ####################
 ####### Cell to cell communication between  epithelial cells and to nasal neutrophils
-library(SingleCellExperiment)
-library(dplyr)
-library(ggplot2)
-library(multinichenetr)
-library(nichenetr)
-library(Seurat)
-library(gridGraphics)
-library(patchwork)
-
 # Load the data
 Supp_figure_4_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Supp_figure_4_data.rds")
 Immune_cells <- Supp_figure_4_data
@@ -2110,19 +2074,11 @@ Supp_Fig4a3_circos <- ggplot_from_grob(Supp_Fig4a3_circos)
 Supp_Fig4a <- Supp_Fig4a1_circos + Supp_Fig4a2_circos + Supp_Fig4a3_circos + plot_layout(ncol = 3)
 print(Supp_Fig4a)
 
-
-
 #################################### FIGURE 5 ##################################
 # Differential gene expression using MAST
-
-# Load libraries
-library(Seurat)
-library(dplyr)
-
-
-
-Figure_3def_5abcd_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3def_5abcd_data.rds")
-Immune_cells <- Figure_5abcd_data
+Figure_5abc_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3def_5abcdgj_data.rds")
+Immune_cells <- Figure_5abc_data
+DimPlot(Immune_cells)
 # Immune cells
 # Function to run FindMarkers for a single cluster comparing HIV+ ART<3 Months with HIV-
 run_seurat_mast_de3mvsneg <- function(seurat_obj, cluster_name) {
@@ -2338,11 +2294,6 @@ Fig5b <- seurat_mast_3mvsneg_de_Neutrophils %>%
         axis.title = element_text(size = 35))
 Fig5b
 
-# Save Figure 5b
-ggsave(Fig5b,filename="HIV-PAPER/Figures/Figure 5/Fig5b.png",
-       width = 14,height = 18,dpi = 300)
-ggsave(Fig5b,filename="HIV-PAPER/Figures/Figure 5/Fig5b.pdf",
-       width = 14,height = 18,dpi = 300)
 
 # Volcanoplot Neutrophils 1yvsneg
 seurat_mast_1yvsneg_de_Neutrophils <- read_csv("scRNAseq_Results/Seurat_MAST_DE_Analysis/seurat_mast_1yvsneg_de_Neutrophils.csv") %>%
@@ -2378,11 +2329,6 @@ Fig5a <-seurat_mast_1yvsneg_de_Neutrophils %>%
         axis.text.y = element_text(size = 30),
         axis.title = element_text(size = 35))
 Fig5a
-# Save Figure 6a2
-ggsave(Fig5a,filename="HIV-PAPER/Figures/Figure 5/Fig5a.png",
-       width = 14,height = 18,dpi = 300)
-ggsave(Fig5a,filename="HIV-PAPER/Figures/Figure 5/Fig5a.pdf",
-       width = 14,height = 18,dpi = 300)
 
 
 # Volcanoplot Neutrophils 3mvs1y
@@ -2413,17 +2359,13 @@ Fig5c <- seurat_mast_3mvs1y_de_Neutrophils %>%
         axis.text.y = element_text(size = 30),
         axis.title = element_text(size = 35))
 Fig5c
-# Save Figure 5c
-ggsave(Fig5c,filename="HIV-PAPER/Figures/Figure 5/Fig5c.png",
-       width = 14,height = 18,dpi = 300)
-ggsave(Fig5c,filename="HIV-PAPER/Figures/Figure 5/Fig5c.pdf",
-       width = 14,height = 18,dpi = 300)
 
 
 # CEMITool
 # CEMiTool in Neutrophils
 # Aggregate expression
-Neutrophils <- subset(Figure_4_data, idents = "Neutrophils")
+Figure_5d_5f_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3abc_4a_5d-5f_6d-6f_supp_fig3_data.rds")
+Neutrophils <- subset(Figure_5d_5f_data, idents = "Neutrophils")
 
 Neutrophil_cts <- Seurat::AggregateExpression(
   object = Neutrophils,
@@ -2547,11 +2489,6 @@ Fig5d <- Neutrophil_enrichment %>%
       label.theme = element_text(size = 30),        # Size of the legend labels
       override.aes = list(size = c(15,25,40))))
 Fig5d
-ggsave(Fig5d,filename="HIV-PAPER/Figures/Figure 5/Fig5d.png",
-       width = 10,height = 12, dpi = 300,units = "in")
-ggsave(Fig5d,filename="HIV-PAPER/Figures/Figure 5/Fig5d.pdf",
-       width = 10,height = 12, dpi = 300,units = "in")
-
 
 Neutrophil_M1_pathways <- Neutrophil_cem@ora %>%
   dplyr::filter(Module=="M1",p.adjust<0.05)
@@ -2589,11 +2526,6 @@ Fig5e <- Neutrophil_cem@ora %>%
     barheight=15.5))+
   geom_vline(xintercept = -log10(0.05), linetype='dashed')
 Fig5e
-ggsave(Fig5e,filename="HIV-PAPER/Figures/Figure 5/Fig5e.png",
-       width = 15,height = 14,dpi = 300,units = "in")
-ggsave(Fig5e,filename="HIV-PAPER/Figures/Figure 5/Fig5e.pdf",
-       width = 15,height = 14,dpi = 300,units = "in")
-
 
 Neutrophil_M2_pathways <- Neutrophil_cem@ora %>%
   dplyr::filter(p.adjust<.05,
@@ -2631,11 +2563,6 @@ Fig5f <- Neutrophil_cem@ora %>%
     barheight=15.5))+
   geom_vline(xintercept = -log10(0.05), linetype='dashed')
 Fig5f
-
-ggsave(Fig5f,filename="HIV-PAPER/Figures/Figure 5/Fig5f.png",
-       width = 15,height = 14,dpi = 300,units = "in")
-ggsave(Fig5f,filename="HIV-PAPER/Figures/Figure 5/Fig5f.pdf",
-       width = 15,height = 14,dpi = 300,units = "in")
 
 # Gene Module scores
 # Function to extract gene list from CEMiTool ORA results for a given pathway
@@ -2700,19 +2627,18 @@ module_features <- list(
   NOTCH2 = NOTCH2
 )
 
-load("Data/Single_Cell_Data/Immune_cells.RData")
-Figure_5g_to_5j_data <- Immune_cells
-saveRDS(Figure_5g_to_5j_data, file="HIV-PAPER/Data/SPN-PLHIV_2025_Data/Figure_5g_to_5j_data.rds")
+Figure_5gj_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_Data/Figure_3def_5abcdgj_data.rds")
+Immune_cells <- Figure_5gj_data
 # Add all module scores in one call
-Figure_5g_to_5j_data <- AddModuleScore(
-  object = Figure_5g_to_5j_data,
+Immune_cells <- AddModuleScore(
+  object = Immune_cells,
   features = module_features,
   name = names(module_features),  # Names will be appended with numbers (e.g., "Glycan_biosynthesis1")
   slot = "data"
 )
 
 
-Fig5g <- Figure_5g_to_5j_data@meta.data %>%
+Fig5g <- Immune_cells@meta.data %>%
   dplyr::filter(Clusters=="Neutrophils",
                 SASP2>0) %>%
   ggplot(aes(HIV_Status,SASP2,fill = HIV_Status))+
@@ -2750,13 +2676,9 @@ Fig5g <- Figure_5g_to_5j_data@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig5g
-ggsave(Fig5g,filename="HIV-PAPER/Figures/Figure 5/Fig5g.png",
-       width = 8,height = 10,dpi = 300,units = "in")
-ggsave(Fig5g,filename="HIV-PAPER/Figures/Figure 5/Fig5g.pdf",
-       width = 8,height = 10,dpi = 300,units = "in")
 
 
-Fig5h <- Figure_5g_to_5j_data@meta.data %>%
+Fig5h <- Immune_cells@meta.data %>%
   dplyr::filter(Clusters=="Neutrophils",
                 IFN_signalling4>0) %>%
   ggplot(aes(HIV_Status,IFN_signalling4,fill = HIV_Status))+
@@ -2796,13 +2718,9 @@ Fig5h <- Figure_5g_to_5j_data@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig5h
-ggsave(Fig5h,filename="HIV-PAPER/Figures/Figure 5/Fig5h.png",
-       width = 8,height = 10,dpi = 300,units = "in")
-ggsave(Fig5h,filename="HIV-PAPER/Figures/Figure 5/Fig5h.pdf",
-       width = 8,height = 10,dpi = 300,units = "in")
 
 
-Fig5i <- Figure_5g_to_5j_data@meta.data %>%
+Fig5i <- Immune_cells@meta.data %>%
   dplyr::filter(Clusters=="Neutrophils",
                 Nef_HIV_replication17>0) %>%
   ggplot(aes(HIV_Status,IFN_signalling4,fill = HIV_Status))+
@@ -2840,13 +2758,9 @@ Fig5i <- Figure_5g_to_5j_data@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig5i
-ggsave(Fig5i,filename="HIV-PAPER/Figures/Figure 5/Fig5i.png",
-       width = 8,height = 10,dpi = 300,units = "in")
-ggsave(Fig5i,filename="HIV-PAPER/Figures/Figure 5/Fig5i.pdf",
-       width = 8,height = 10,dpi = 300,units = "in")
 
 # Figure 6d
-Fig5j <- Figure_5g_to_5j_data@meta.data %>%
+Fig5j <- Immune_cells@meta.data %>%
   dplyr::filter(Clusters=="Neutrophils",
                 SASP2>0) %>%
   ggplot(aes(HIV_Status,APC_MHC17,fill = HIV_Status))+
@@ -2884,13 +2798,8 @@ Fig5j <- Figure_5g_to_5j_data@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig5j
-ggsave(Fig5j,filename="HIV-PAPER/Figures/Figure 5/Fig5j.png",
-       width = 8,height = 10,dpi = 300,units = "in")
-ggsave(Fig5j,filename="HIV-PAPER/Figures/Figure 5/Fig5j.pdf",
-       width = 8,height = 10,dpi = 300,units = "in")
 
 
-Phagocytosis_data <- read_csv("Data/Main_Files_Thesis/Neutrophil_Phagocytosis.csv")
 Figure_5k_5l_data <- read_csv("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_5k_5l_data.csv")
 # MFI of Phagocytosis
 Fig5k_counts <- Figure_5k_5l_data %>%
@@ -2950,11 +2859,6 @@ Fig5k <- Figure_5k_5l_data %>%
         axis.text.y = element_text(size = 30),
         axis.title = element_text(size = 30))
 Fig5k
-
-ggsave(Fig5k,filename="HIV-PAPER/Figures/Figure 5/Fig5k.png",
-       width = 8,height = 10,dpi = 300,units = "in")
-ggsave(Fig5k,filename="HIV-PAPER/Figures/Figure 5/Fig5k.pdf",
-       width = 8,height = 10,dpi = 300,units = "in")
 
 
 # MFI of Oxidation
@@ -3018,30 +2922,9 @@ Fig5l <- Figure_5k_5l_data %>%
         axis.title = element_text(size = 30))
 Fig5l
 
-ggsave(Fig5l,filename="HIV-PAPER/Figures/Figure 5/Fig5l.png",
-       width = 8,height = 10,dpi = 300,units = "in")
-ggsave(Fig5l,filename="HIV-PAPER/Figures/Figure 5/Fig5l.pdf",
-       width = 8,height = 10,dpi = 300,units = "in")
-
-
-# Save figure 5 ggsave
-ggsave(filename = "HIV-PAPER/Figures/Figure 5/Fig5.png",
-       plot = ((Fig5a|Fig5b|Fig5c|plot_layout(ncol = 3,nrow = 1, width = c(1,1,1))))/ 
-         (Fig5d|Fig5e|Fig5f|plot_layout(width = c(0.8,1,1)))/
-         (Fig5g|Fig5h|Fig5i|Fig5j|plot_layout(width = c(1,1,1,1)))/
-         (Fig5k|Fig5l|plot_spacer()|plot_layout(width = c(1,1,1,1))),
-       width = 42, height = 50, units = "in", dpi = 300,limitsize = F)
-
-ggsave(filename = "HIV-PAPER/Figures/Figure 5/Fig5.pdf",
-       plot = ((Fig5a|Fig5b|Fig5c|plot_layout(ncol = 3,nrow = 1, width = c(1,1,1))))/ 
-         (Fig5d|Fig5e|Fig5f|plot_layout(width = c(0.8,1,1)))/
-         (Fig5g|Fig5h|Fig5i|Fig5j|plot_layout(width = c(1,1,1,1)))/
-         (Fig5k|Fig5l|plot_spacer()|plot_layout(width = c(1,1,1,1))),
-       width = 42, height = 50, units = "in", dpi = 300,limitsize = F)
-
 #################################### SUPPLEMENTARY FIGURE 5 #########################
-# Save figure 5 ggsave
-Extended_Fig5a <- Neutrophil_cem@ora %>%
+
+Supplementary_Fig5a <- Neutrophil_cem@ora %>%
   dplyr::filter(Module=="M1") %>%
   dplyr::mutate(Significance=ifelse(p.adjust<.05 & FoldEnrichment>0,"Upregulated",
                                     ifelse(p.adjust<.05 & FoldEnrichment<0,"Downregulated","Not significant")),
@@ -3063,14 +2946,10 @@ Extended_Fig5a <- Neutrophil_cem@ora %>%
         axis.text.x = element_text(size = 30),
         axis.text.y = element_text(size = 30),
         axis.title = element_text(size = 35))
-Extended_Fig5a
+Supplementary_Fig5a
 
-ggsave(Extended_Fig5a,filename="HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5a.png",
-       width = 12,height = 15,dpi = 300,units = "in")
-ggsave(Extended_Fig5a,filename="HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5a.pdf",
-       width = 12,height = 15,dpi = 300,units = "in")
 
-Extended_Fig5b <- Neutrophil_cem@ora %>%
+Supplementary_Fig5b <- Neutrophil_cem@ora %>%
   dplyr::filter(Module=="M2") %>%
   dplyr::mutate(Significance=ifelse(p.adjust<.05 & FoldEnrichment>0,"Upregulated",
                                     ifelse(p.adjust<.05 & FoldEnrichment<0,"Downregulated","Not significant")),
@@ -3092,14 +2971,9 @@ Extended_Fig5b <- Neutrophil_cem@ora %>%
         axis.text.x = element_text(size = 30),
         axis.text.y = element_text(size = 30),
         axis.title = element_text(size = 35))
-Extended_Fig5b
-# Save Figure 5b
-ggsave(Extended_Fig5b,filename="HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5b.png",
-       width = 12,height = 15,dpi = 300,units = "in")
-ggsave(Extended_Fig5b,filename="HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5b.pdf",
-       width = 12,height = 15,dpi = 300,units = "in")
+Supplementary_Fig5b
 
-Extended_Fig5c <- Seurat::DotPlot(
+Supplementary_Fig5c <- Seurat::DotPlot(
   Immune_cells,
   idents = "Neutrophils",
   dot.min = 0,
@@ -3170,27 +3044,7 @@ Extended_Fig5c <- Seurat::DotPlot(
       title.theme = element_text(size = 30),
       label.theme = element_text(size = 18),
       barwidth = 1))
-Extended_Fig5c
-
-ggsave(Extended_Fig5c,filename="HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5c.png",
-       width = 14,height = 14,dpi = 300,units = "in")
-ggsave(Extended_Fig5c,filename="HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5c.pdf",
-       width = 14,height = 14,dpi = 300,units = "in")
-
-
-# Save extended figure 5 ggsave
-ggsave(filename = "HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5.png",
-       plot = ((Extended_Fig5a|Extended_Fig5b|Extended_Fig5c|plot_layout(ncol = 3,nrow = 1, width = c(1,1,1))))/
-         (plot_spacer()|plot_layout(width = c(3)))/
-         (plot_spacer()|plot_layout(width = c(3))),
-       width = 32, height = 29, units = "in", dpi = 300,limitsize = F)
-
-ggsave(filename = "HIV-PAPER/Figures/Extended_Figure 5/Extended_Fig5.pdf",
-       plot = ((Extended_Fig5a|Extended_Fig5b|Extended_Fig5c|plot_layout(ncol = 3,nrow = 1, width = c(1,1,1))))/
-         (plot_spacer()|plot_layout(width = c(3)))/
-         (plot_spacer()|plot_layout(width = c(3))),
-       width = 32, height = 29, units = "in", dpi = 300,limitsize = F)
-
+Supplementary_Fig5c
 
 #################################### FIGURE 6 ##################################
 # Differential expression in T cells
@@ -3230,12 +3084,6 @@ Fig6b <- Sig_Tcell_3m_vs_Neg %>%
 
 Fig6b
 
-# Save Figure 6b
-ggsave(Fig6b,filename="HIV-PAPER/Figures/Figure 6/Fig6b.png",
-       width = 14,height = 18,dpi = 300)
-ggsave(Fig6b,filename="HIV-PAPER/Figures/Figure 6/Fig6b.pdf",
-       width = 14,height = 18,dpi = 300)
-
 
 
 Tcell_1y_vs_Neg <- SeuratExtend::VolcanoPlot(
@@ -3270,12 +3118,6 @@ Fig6a <- Sig_Tcell_1y_vs_Neg %>%
         axis.text.y = element_text(size = 30),
         axis.title = element_text(size = 35))
 Fig6a
-
-# Save Figure 6a
-ggsave(Fig6a,filename="HIV-PAPER/Figures/Figure 6/Fig6a.png",
-       width = 14,height = 18,dpi = 300)
-ggsave(Fig6a,filename="HIV-PAPER/Figures/Figure 6/Fig6a.pdf",
-       width = 14,height = 18,dpi = 300)
 
 
 Tcell_3m_vs_1y <- SeuratExtend::VolcanoPlot(
@@ -3313,10 +3155,6 @@ Fig6c <- Sig_Tcell_3m_vs_1y %>%
 Fig6c
 
 # Save Figure 6c
-ggsave(Fig6c,filename="HIV-PAPER/Figures/Figure 6/Fig6c.png",
-       width = 14,height = 18,dpi = 300)
-ggsave(Fig6c,filename="HIV-PAPER/Figures/Figure 6/Fig6c.pdf",
-       width = 14,height = 18,dpi = 300)
 
 # CEMITool
 Figure_6_data <- readRDS("HIV-PAPER/Data/SPN-PLHIV_2025_data/Figure_3_data.rds")
@@ -3365,7 +3203,7 @@ Tcell_cem <- CEMiTool::cemitool(
   filter = TRUE,
   filter_pval = 0.05,
   apply_vst = TRUE,
-  cor_method = "spearman",  # Spearman is often better for sparse scRNA-seq data
+  cor_method = "spearman", 
   cor_function = "cor",
   network_type = "signed",
   gsea_scale = TRUE,
@@ -3436,7 +3274,6 @@ Fig6d <- Tcell_enrichment %>%
                             "PLHIV on ART>1y"="PLHIV\nART>1yr"))+
   theme_classic()+
   theme(plot.title = element_text(size = 60, face = "bold",hjust = -0.1),
-        #legend.position = 'none',
         axis.title = element_blank(),
         axis.ticks.length = unit(0.5,'cm'),
         plot.subtitle = element_text(size = 30, hjust = .5),
@@ -3456,10 +3293,7 @@ Fig6d <- Tcell_enrichment %>%
       label.theme = element_text(size = 30),        # Size of the legend labels
       override.aes = list(size = c(15,25,40))))
 Fig6d
-ggsave(Fig6d,filename="HIV-PAPER/Figures/Figure 6/Fig6d.png",
-       width = 10,height = 12, dpi = 300,units = "in")
-ggsave(Fig6d,filename="HIV-PAPER/Figures/Figure 6/Fig6d.pdf",
-       width = 10,height = 12, dpi = 300,units = "in")
+
 
 
 Tcell_cem@ora$ID <- str_wrap(Tcell_cem@ora$ID, width = 50)
@@ -3475,7 +3309,6 @@ Fig6e <- Tcell_cem@ora %>%
              fill=FoldEnrichment))+
   geom_col()+
   scale_fill_gradient(low = "#4A527F", high = "#931500")+
-  #scale_fill_gradient(low = "grey", high = "darkblue")+
   labs(x = "-log10(padj)", 
        title = "e.",
        subtitle = "M1 over-represented pathways")+
@@ -3497,10 +3330,7 @@ Fig6e <- Tcell_cem@ora %>%
     barsize = 1))+
   geom_vline(xintercept = -log10(0.05), linetype='dashed')
 Fig6e
-ggsave(Fig6e,filename="HIV-PAPER/Figures/Figure 6/Fig6e.png",
-       width = 15,height = 14, dpi = 300,units = "in")
-ggsave(Fig6e,filename="HIV-PAPER/Figures/Figure 6/Fig6e.pdf",
-       width = 15,height = 14, dpi = 300,units = "in")
+
 
 
 Tcell_cem@ora$ID <- str_wrap(Tcell_cem@ora$ID, width = 50)
@@ -3538,10 +3368,7 @@ Fig6f <- Tcell_cem@ora %>%
     barheight=15.5))+
   geom_vline(xintercept = -log10(0.05), linetype='dashed')
 Fig6f
-ggsave(Fig6f,filename="HIV-PAPER/Figures/Figure 6/Fig6f.png",
-       width = 15,height = 14, dpi = 300,units = "in")
-ggsave(Fig6f,filename="HIV-PAPER/Figures/Figure 6/Fig6f.pdf",
-       width = 15,height = 14, dpi = 300,units = "in")
+
 
 # Figure 6g
 sig_1yvsNeg_genes <- Sig_Tcell_1y_vs_Neg %>%
@@ -3645,7 +3472,6 @@ Fig6g <- Tcells@meta.data %>%
   scale_x_discrete(labels=c("HIV+ ART<3 Months"="PLHIV\nART<3m",
                             "HIV+ ART>1 Year"="PLHIV\nART>1yr",
                             "HIV-"="HIV-"))+
-  #scale_y_continuous(limits = c(-0.5,4.5))+
   theme_classic2()+
   theme(panel.grid = element_blank(),
         legend.position = "none",
@@ -3658,10 +3484,7 @@ Fig6g <- Tcells@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig6g
-ggsave(Fig6g,filename="HIV-PAPER/Figures/Figure 6/Fig6g.png",
-       width = 9,height = 12, dpi = 300,units = "in")
-ggsave(Fig6g,filename="HIV-PAPER/Figures/Figure 6/Fig6g.pdf",
-       width = 9,height = 12, dpi = 300,units = "in")
+
 
 Fig6h <- Tcells@meta.data %>%
   ggplot(aes(HIV_Status,Activation1,fill = HIV_Status))+
@@ -3686,7 +3509,6 @@ Fig6h <- Tcells@meta.data %>%
   scale_x_discrete(labels=c("HIV+ ART<3 Months"="PLHIV\nART<3m",
                             "HIV+ ART>1 Year"="PLHIV\nART>1yr",
                             "HIV-"="HIV-"))+
-  #scale_y_continuous(limits = c(-0.5,4.5))+
   theme_classic2()+
   theme(panel.grid = element_blank(),
         legend.position = "none",
@@ -3699,10 +3521,6 @@ Fig6h <- Tcells@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig6h
-ggsave(Fig6h,filename="HIV-PAPER/Figures/Figure 6/Fig6h.png",
-       width = 9,height = 12, dpi = 300,units = "in")
-ggsave(Fig6h,filename="HIV-PAPER/Figures/Figure 6/Fig6h.pdf",
-       width = 9,height = 12, dpi = 300,units = "in")
 
 
 Fig6i <- Tcells@meta.data %>%
@@ -3728,7 +3546,6 @@ Fig6i <- Tcells@meta.data %>%
   scale_x_discrete(labels=c("HIV+ ART<3 Months"="PLHIV\nART<3m",
                             "HIV+ ART>1 Year"="PLHIV\nART>1yr",
                             "HIV-"="HIV-"))+
-  #scale_y_continuous(limits = c(-0.5,4.5))+
   theme_classic2()+
   theme(panel.grid = element_blank(),
         legend.position = "none",
@@ -3741,10 +3558,6 @@ Fig6i <- Tcells@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig6i
-ggsave(Fig6i,filename="HIV-PAPER/Figures/Figure 6/Fig6i.png",
-       width = 9,height = 12, dpi = 300,units = "in")
-ggsave(Fig6i,filename="HIV-PAPER/Figures/Figure 6/Fig6i.pdf",
-       width = 9,height = 12, dpi = 300,units = "in")
 
 
 Fig6j <- Tcells@meta.data %>%
@@ -3770,7 +3583,6 @@ Fig6j <- Tcells@meta.data %>%
   scale_x_discrete(labels=c("HIV+ ART<3 Months"="PLHIV\nART<3m",
                             "HIV+ ART>1 Year"="PLHIV\nART>1yr",
                             "HIV-"="HIV-"))+
-  #scale_y_continuous(limits = c(-0.5,4.5))+
   theme_classic2()+
   theme(panel.grid = element_blank(),
         legend.position = "none",
@@ -3783,29 +3595,64 @@ Fig6j <- Tcells@meta.data %>%
         plot.subtitle = element_text(hjust = 0.5,size = 30))
 
 Fig6j
-ggsave(Fig6j,filename="HIV-PAPER/Figures/Figure 6/Fig6j.png",
-       width = 9,height = 12, dpi = 300,units = "in")
-ggsave(Fig6j,filename="HIV-PAPER/Figures/Figure 6/Fig6j.pdf",
-       width = 9,height = 12, dpi = 300,units = "in")
+#################################### SUPPLEMENTARY FIGURE 6 ####################
+Extended_Fig6a <- Tcell_cem@ora %>%
+  dplyr::filter(Module=="M1") %>%
+  dplyr::mutate(Significance=ifelse(p.adjust<.05 & FoldEnrichment>0,"Upregulated",
+                                    ifelse(p.adjust<.05 & FoldEnrichment<0,"Downregulated","Not significant")),
+                label = ifelse(Significance=="Upregulated",Description,NA)) %>%
+  ggplot(aes(FoldEnrichment,-log10(p.adjust), color=Significance))+
+  geom_point(size=2.5,alpha=.5)+
+  geom_hline(yintercept = -log10(0.05), linetype="dashed")+
+  geom_text_repel(aes(label = label),size=5,color='black')+
+  scale_color_manual(values = c('grey','red'))+
+  labs(x="Fold-Enrichment",
+       y="-Log"[10]~"(padj)",
+       title = 'a.',
+       subtitle = "M1 T cell enriched modules\nPLHIV-ART>1yr")+
+  theme_classic()+
+  theme(plot.title = element_text(size = 50, face = "bold"),
+        legend.position = 'none',
+        axis.ticks.length = unit(0.5,'cm'),
+        plot.subtitle = element_text(size = 30, hjust = .5),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title = element_text(size = 35))
+Extended_Fig6a
 
-# Save figure 6 ggsave
-ggsave(filename = "HIV-PAPER/Figures/Figure 6/Fig6.png",
-       plot =((Fig6a|Fig6b|Fig6c|plot_layout(ncol = 3,nrow = 1, width = c(1,1,1))))/ 
-         (Fig6d|Fig6e|Fig6f|plot_layout(width = c(0.8,1,1)))/
-         (Fig6g|Fig6h|Fig6i|Fig6j|plot_layout(width = c(1,1,1,1)))/
-         (plot_spacer()|plot_layout(width = c(4))),
-       width = 42, height = 50, units = "in", dpi = 300,limitsize = F)
+ggsave(Extended_Fig6a,filename="HIV-PAPER/Figures/Extended_Figure 6/Extended_Fig6a.png",
+       width = 12,height = 15,dpi = 300,units = "in")
+ggsave(Extended_Fig6a,filename="HIV-PAPER/Figures/Extended_Figure 6/Extended_Fig6a.pdf",
+       width = 12,height = 15,dpi = 300,units = "in")
 
-ggsave(filename = "HIV-PAPER/Figures/Figure 6/Fig6.pdf",
-       plot =((Fig6a|Fig6b|Fig6c|plot_layout(ncol = 3,nrow = 1, width = c(1,1,1))))/ 
-         (Fig6d|Fig6e|Fig6f|plot_layout(width = c(0.8,1,1)))/
-         (Fig6g|Fig6h|Fig6i|Fig6j|plot_layout(width = c(1,1,1,1)))/
-         (plot_spacer()|plot_layout(width = c(4))),
-       width = 42, height = 50, units = "in", dpi = 300,limitsize = F)
-
-
-
-
+Extended_Fig6b <- Tcell_cem@ora %>%
+  dplyr::filter(Module=="M2") %>%
+  dplyr::mutate(Significance=ifelse(p.adjust<.05 & FoldEnrichment>0,"Upregulated",
+                                    ifelse(p.adjust<.05 & FoldEnrichment<0,"Downregulated","Not significant")),
+                label = ifelse(Significance=="Upregulated",Description,NA)) %>%
+  ggplot(aes(FoldEnrichment,-log10(p.adjust), color=Significance))+
+  geom_point(size=2.5,alpha=.5)+
+  geom_hline(yintercept = -log10(0.05), linetype="dashed")+
+  geom_text_repel(aes(label = label),size=5,color='black')+
+  scale_color_manual(values = c('grey','red'))+
+  labs(x="Fold-Enrichment",
+       y="-Log"[10]~"(padj)",
+       title = 'b.',
+       subtitle = "M2 T cell enriched modules\n(PLHIV-ART<3m)")+
+  theme_classic()+
+  theme(plot.title = element_text(size = 50, face = "bold"),
+        legend.position = 'none',
+        axis.ticks.length = unit(0.5,'cm'),
+        plot.subtitle = element_text(size = 30,hjust = .5),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title = element_text(size = 35))
+Extended_Fig6b
+# Save Figure 6b
+ggsave(Extended_Fig6b,filename="HIV-PAPER/Figures/Extended_Figure 6/Extended_Fig6b.png",
+       width = 12,height = 15,dpi = 300,units = "in")
+ggsave(Extended_Fig6b,filename="HIV-PAPER/Figures/Extended_Figure 6/Extended_Fig6b.pdf",
+       width = 12,height = 15,dpi = 300,units = "in")
 #################################### FIGURE 7 ##################################
 # Relationship between Nasopharyngeal pneumococcal carriage and Neutrophil dynamics
 Fig7a <- Figure_7a_data %>%
